@@ -75,13 +75,13 @@ function HandlePlay(PlayerController PC)
 {
     if(!PC.PlayerReplicationInfo.bOnlySpectator)
         return;
-        
+
     PC.BecomeActivePlayer();
 }
 
 function HandleSwichRed(PlayerController PC)
 {
-    if(!bTeamGame)
+    if(!bTeamGame || PC.PlayerReplicationInfo.Team.TeamIndex == 0)
         return;
 
     if(PC.PlayerReplicationInfo.bOnlySpectator)
@@ -91,7 +91,7 @@ function HandleSwichRed(PlayerController PC)
 
 function HandleSwitchBlue(PlayerController PC)
 {
-    if(!bTeamGame)
+    if(!bTeamGame || PC.PlayerReplicationInfo.Team.TeamIndex == 1)
         return;
 
     if(PC.PlayerReplicationInfo.bOnlySpectator)
