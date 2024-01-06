@@ -15,6 +15,7 @@ function PreBeginPlay()
 
     Log("Initializing ChatCommands mutator...");
 
+    SaveConfig(); // Generate config file if it doesn't exist
     Super.PreBeginPlay();
 
     NewBroadcastHandler = Spawn(class'ChatCommandsBroadcastHandler');
