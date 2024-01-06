@@ -1,12 +1,21 @@
 class ChatCommandsBroadcastHandler extends BroadcastHandler;
 
 var string CommandPrefix;
-var string CommandSpectate;
-var string CommandPlay;
+var string CommandSpectate, CommandSpectateLong;
+var string CommandPlay, CommandPlayLong;
+var string CommandRedTeam, CommandRedTeamLong;
+var string CommandBlueTeam, CommandBlueTeamLong;
 var string CommandDisconnect;
 var string CommandExit;
 var string CommandQuit;
+var bool bTeamGame;
 var array<MutChatCommands.ICustomCommand> CustomCommands;
+
+function PreBeginPlay()
+{
+    Super.PreBeginPlay();
+    bTeamGame = TeamGame(Level.Game) != None;
+}
 
 function Broadcast(Actor Sender, coerce string Msg, optional name Type)
 {
@@ -23,15 +32,40 @@ function ExecuteCommand(string Command, PlayerController PC)
     if(Len(Command) == 0)
         return;
     
-    if(Command ~= CommandSpectate)
+    if((Command ~= CommandSpectate || Command ~= CommandSpectateLong) && !PC.PlayerReplicationInfo.bOnlySpectator)
         PC.BecomeSpectator();
-    else if(Command ~= CommandPlay)
+    else if(Command ~= CommandPlay || Command ~= CommandPlayLong)
         PC.BecomeActivePlayer();
+    else if(Command ~= CommandRedTeam || Command ~= CommandRedTeamLong)
+        HandleSwichRed(PC);
+    else if(Command ~= CommandBlueTeam || Command ~= CommandBlueTeamLong)
+        HandleSwitchBlue(PC);
     else if(Command ~= CommandDisconnect)
         HandleDisconnect(PC);
     else if(Command ~= CommandExit || Command ~= CommandQuit)
         HandleQuit(PC);
-    else HandleCustomCommand(Command, PC);
+    else
+        HandleCustomCommand(Command, PC);
+}
+
+function HandleSwichRed(PlayerController PC)
+{
+    if(!bTeamGame)
+        return;
+
+    if(PC.PlayerReplicationInfo.bOnlySpectator)
+        PC.BecomeActivePlayer();
+    PC.ChangeTeam(0);
+}
+
+function HandleSwitchBlue(PlayerController PC)
+{
+    if(!bTeamGame)
+        return;
+
+    if(PC.PlayerReplicationInfo.bOnlySpectator)
+        PC.BecomeActivePlayer();
+    PC.ChangeTeam(1);
 }
 
 function HandleDisconnect(PlayerController PC)
@@ -57,15 +91,10 @@ function HandleCustomCommand(string Command, PlayerController PC)
 {
     local int i;
 
-    PC.ClientMessage("Executing custom command: " $ Command);
-
     for(i=0; i < CustomCommands.Length; i++)
     {
-        PC.ClientMessage("Comparing " $ Command $ " with " $ CustomCommands[i].ChatCommand);
-
         if(Command ~= CustomCommands[i].ChatCommand)
         {
-            PC.ClientMessage("Executing custom command: " $ CustomCommands[i].ChatCommand $ " -> '" $ CustomCommands[i].PlayerCommand $ "'");
             ExecuteCustomCommand(CustomCommands[i], PC);
             return;
         }
@@ -85,7 +114,15 @@ defaultproperties {
     CommandPrefix="!"
     CommandSpectate="s"
     CommandPlay="p"
+    CommandRedTeam="r"
+    CommandBlueTeam="b"
     CommandExit="exit"
+
+    // Long commands
+    CommandSpectateLong="spec"
+    CommandPlayLong="play"
+    CommandRedTeamLong="red"
+    CommandBlueTeamLong="blue"
     CommandDisconnect="disconnect"
     CommandQuit="quit"
 }

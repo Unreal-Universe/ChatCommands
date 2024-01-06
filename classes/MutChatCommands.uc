@@ -48,5 +48,6 @@ function AddClientReplication(Actor Other)
 defaultproperties {
     GroupName="ChatCommands"
     FriendlyName="Chat Commands"
-    Description="Allows players to use commands such as !s to become a spectator, or !p to become a player."
+    Description="Allows players to use commands such as !s to become a spectator, or !p to become a player." 
+    bAddToServerPackages=True
 }
