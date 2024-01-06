@@ -31,21 +31,52 @@ function ExecuteCommand(string Command, PlayerController PC)
 
     if(Len(Command) == 0)
         return;
-    
-    if((Command ~= CommandSpectate || Command ~= CommandSpectateLong) && !PC.PlayerReplicationInfo.bOnlySpectator)
-        PC.BecomeSpectator();
-    else if(Command ~= CommandPlay || Command ~= CommandPlayLong)
-        PC.BecomeActivePlayer();
-    else if(Command ~= CommandRedTeam || Command ~= CommandRedTeamLong)
-        HandleSwichRed(PC);
-    else if(Command ~= CommandBlueTeam || Command ~= CommandBlueTeamLong)
-        HandleSwitchBlue(PC);
-    else if(Command ~= CommandDisconnect)
-        HandleDisconnect(PC);
-    else if(Command ~= CommandExit || Command ~= CommandQuit)
-        HandleQuit(PC);
-    else
-        HandleCustomCommand(Command, PC);
+
+    switch(Command)
+    {
+        case CommandSpectate:
+        case CommandSpectateLong:
+            HandleSpectate(PC);
+            break;
+        case CommandPlay:
+        case CommandPlayLong:
+            HandlePlay(PC);
+            break;
+        case CommandRedTeam:
+        case CommandRedTeamLong:
+            HandleSwichRed(PC);
+            break;
+        case CommandBlueTeam:
+        case CommandBlueTeamLong:
+            HandleSwitchBlue(PC);
+            break;
+        case CommandDisconnect:
+            HandleDisconnect(PC);
+            break;
+        case CommandExit:
+        case CommandQuit:
+            HandleQuit(PC);
+            break;
+        default:
+            HandleCustomCommand(Command, PC);
+            break;
+    }
+}
+
+function HandleSpectate(PlayerController PC)
+{
+    if(PC.PlayerReplicationInfo.bOnlySpectator)
+        return;
+
+    PC.BecomeSpectator();
+}
+
+function HandlePlay(PlayerController PC)
+{
+    if(!PC.PlayerReplicationInfo.bOnlySpectator)
+        return;
+        
+    PC.BecomeActivePlayer();
 }
 
 function HandleSwichRed(PlayerController PC)
