@@ -120,25 +120,27 @@ function HandleQuit(PlayerController PC)
 
 function HandleCustomCommand(string Command, PlayerController PC)
 {
+    local string Params;
     local int i;
 
     for(i=0; i < CustomCommands.Length; i++)
     {
-        if(Command ~= CustomCommands[i].ChatCommand)
+        if(Left(Command, Len(CustomCommands[i].ChatCommand)) ~= CustomCommands[i].ChatCommand)
         {
-            ExecuteCustomCommand(CustomCommands[i], PC);
+            Params = Mid(Command, Len(CustomCommands[i].ChatCommand) + 1);
+            ExecuteCustomCommand(CustomCommands[i], Params, PC);
             return;
         }
     }
 }
 
-function ExecuteCustomCommand(MutChatCommands.ICustomCommand Command, PlayerController PC)
+function ExecuteCustomCommand(MutChatCommands.ICustomCommand Command, string Params, PlayerController PC)
 {
     local ChatCommandsClientReplication ClientReplication;
 
     ClientReplication = class'ChatCommandsUtils'.static.GetReplication(PC);
     if(ClientReplication != None)
-        ClientReplication.ExecuteCommand(Command.PlayerCommand);
+        ClientReplication.ExecuteCommand(Command.PlayerCommand $ Params);
 }
 
 defaultproperties {
