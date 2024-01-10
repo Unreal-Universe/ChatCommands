@@ -127,7 +127,7 @@ function HandleCustomCommand(string Command, PlayerController PC)
     {
         if(Left(Command, Len(CustomCommands[i].ChatCommand)) ~= CustomCommands[i].ChatCommand)
         {
-            Params = Mid(Command, Len(CustomCommands[i].ChatCommand) + 1);
+            Params = Mid(Command, Len(CustomCommands[i].ChatCommand)+1);
             ExecuteCustomCommand(CustomCommands[i], Params, PC);
             return;
         }
@@ -139,8 +139,12 @@ function ExecuteCustomCommand(MutChatCommands.ICustomCommand Command, string Par
     local ChatCommandsClientReplication ClientReplication;
 
     ClientReplication = class'ChatCommandsUtils'.static.GetReplication(PC);
-    if(ClientReplication != None)
-        ClientReplication.ExecuteCommand(Command.PlayerCommand $ Params);
+    if(ClientReplication == None)
+        return;
+
+    if(Len(Params) > 0)
+        ClientReplication.ExecuteCommand(Command.PlayerCommand @ Params);
+    else ClientReplication.ExecuteCommand(Command.PlayerCommand);
 }
 
 defaultproperties {
